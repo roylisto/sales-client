@@ -1,10 +1,13 @@
+/* eslint-disable */
+import Sales from '@/services/Sales'
 
 const state = {
-  sales: null
+  sales: []  
 }
 
 const getters = {
-  getSales: state => state.sales
+  getSales: state => state.sales,
+  getSalesCount: state => state.sales.length
 }
 
 const mutations = {
@@ -16,7 +19,11 @@ const mutations = {
 const actions = {
   setSales({commit}, sales){
     commit('setSales', sales)
-  }  
+  },
+  async fetchSales({commit}){
+    let response = await Sales.list()    
+    commit('setSales', response.data.rows)    
+  }
 }
 
 export default {

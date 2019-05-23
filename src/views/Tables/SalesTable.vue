@@ -13,7 +13,7 @@
           <base-button type="primary" size="sm" @click="showInputForm = true">Add Data</base-button>
           <modal :show.sync="showInputForm"
                body-classes="p-0"
-               modal-classes="modal-dialog-centered modal-sm">
+               modal-classes="modal-dialog-centered">
               <card type="secondary" shadow
                     header-classes="bg-white pb-5"
                     body-classes="px-lg-5 py-lg-5"
@@ -23,16 +23,28 @@
                           <big>Add new sales data</big>
                       </div>
                       <form role="form">
-                          <base-input alternative
+                        <div class="container ct-example-row">
+                          <div class="row">
+                            <div class="col-sm">
+                              <base-dropdown class="mb-3"> 
+                                <base-button block slot="title" type="warning" class="dropdown-toggle">
+                                  {{selectedName}}
+                                </base-button>                                   
+                                <ul>
+                                  <li v-for="(item, index) in products" :key="item.id">
+                                     <a class="dropdown-item" href="#" @click="setSelectedProduct(index)" >{{item.name}}</a>
+                                  </li>
+                                </ul>                           
+                              </base-dropdown>
+                            </div>
+                            <div class="col-sm">
+                              <base-input alternative
                                       class="mb-3"
-                                      placeholder="Email"
-                                      addon-left-icon="ni ni-email-83">
-                          </base-input>
-                          <base-input alternative
-                                      type="password"
-                                      placeholder="Password"
-                                      addon-left-icon="ni ni-lock-circle-open">
-                          </base-input>                          
+                                      placeholder="Quantity">
+                              </base-input>  
+                            </div>                            
+                          </div>
+                        </div>                                                                                                  
                           <div class="text-center">
                               <base-button block type="success" class="my-4">Save</base-button>
                           </div>
@@ -49,7 +61,7 @@
                   :class="type === 'dark' ? 'table-dark': ''"
                   :thead-classes="type === 'dark' ? 'thead-dark': 'thead-light'"
                   tbody-classes="list"
-                  :data="tableData">
+                  :data="sales">
         <template slot="columns">
           <th>Sales Name</th>
           <th>Product Name</th>
@@ -79,14 +91,15 @@
 
     <div class="card-footer d-flex justify-content-end"
          :class="type === 'dark' ? 'bg-transparent': ''">
-      <base-pagination :total="this.rowCount"></base-pagination>
+      <base-pagination :total="this.salesCount"></base-pagination>
     </div>
 
   </div>
 </template>
 <script>
-/* eslint-disable */
-  import Sales from '@/services/Sales'  
+/* eslint-disable */    
+  import Product from '@/services/Product'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'sales-table',
     props: {
@@ -96,18 +109,44 @@
       title: String
     },
     data() {
-      return {
-        tableData: [],
+      return {                
         rowCount: 0,
-        showInputForm: false
+        showInputForm: false,
+        selectedName: 'Product',
+        selectedId: 0        
       }
     },    
-    created: async function () {
+    /*created: async function () {
       const response = await Sales.list()  
       this.tableData = response.data.rows   
-      this.rowCount = response.data.count       
+      this.rowCount = response.data.count  
+      
+      const prodResponse = await Product.list()      
+      this.products = prodResponse.data.products.rows
+    },*/
+    created() {
+      this.$store.dispatch("fetchSales")
+      this.$store.dispatch("fetchProduct")      
+    },
+    computed: {
+      ...mapGetters({
+        sales: 'getSales',
+        salesCount: 'getSalesCount',
+        products : 'getProduct'
+      })
+    },
+    methods: {      
+      setSelectedProduct(index) {
+        let product = this.products[index]
+        this.selectedName = product.name
+        this.selectedId = product.id
+      }
     }
   }
 </script>
 <style>
+ul {
+  list-style: none;
+  padding-left: 0;
+}
 </style>
