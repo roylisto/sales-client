@@ -93,7 +93,7 @@
 
     <div class="card-footer d-flex justify-content-end"
          :class="type === 'dark' ? 'bg-transparent': ''">
-      <base-pagination :total="this.salesCount"></base-pagination>
+      <base-pagination :total="this.salesCount" v-model="pagination.default"></base-pagination>
     </div>
 
   </div>
@@ -117,11 +117,16 @@
         showInputForm: false,
         selectedName: 'Product',
         selectedId: 0,
-        quantity: 0        
+        quantity: 0,
+        pagination: {
+          default: 1
+        }        
       }
     },
     created() {
-      this.$store.dispatch("fetchSales")
+      this.$store.dispatch("fetchSales", {        
+        userId: this.user.user_id        
+      })
       this.$store.dispatch("fetchProduct")      
     },
     computed: {

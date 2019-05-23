@@ -20,8 +20,8 @@ const actions = {
   setSales({commit}, sales){
     commit('setSales', sales)
   },
-  async fetchSales({commit}){
-    let response = await Sales.list()    
+  async fetchSales({commit}, filters){
+    let response = await Sales.list(filters)           
     commit('setSales', response.data.rows)    
   }
 }

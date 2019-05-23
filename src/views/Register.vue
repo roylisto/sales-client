@@ -68,7 +68,7 @@
           })
           this.model.error = null
           this.$store.dispatch('setUser', response.data)
-          this.$router.push({name: 'dashboard'})       
+          this.$router.push({name: 'tables'})       
           location.reload();   
         } catch (err) {          
           this.model.error = err.response.data.error

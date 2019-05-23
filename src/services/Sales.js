@@ -7,8 +7,9 @@ function getToken(){
   return {headers: {Authorization: token}}
 }
 export default {
-  list() {
-    return Api().get('/sales', getToken())
+  list(filters) {       
+    console.log(filters)
+    return Api().get('/sales', { params: filters })
   },
   add(sales) {
     return Api().post('/sales', sales, getToken())
