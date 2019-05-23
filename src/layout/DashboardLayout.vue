@@ -40,7 +40,7 @@
   import DashboardNavbar from './DashboardNavbar.vue';
   import ContentFooter from './ContentFooter.vue';
   import { FadeTransition } from 'vue2-transitions';
-
+  import { mapGetters } from 'vuex'
   export default {
     components: {
       DashboardNavbar,
@@ -57,6 +57,16 @@
         if (this.$sidebar.showSidebar) {
           this.$sidebar.displaySidebar(false);
         }
+      }
+    },    
+    computed: {
+      ...mapGetters({
+        user: 'getUser'
+      })
+    },
+    created: function () {
+      if (this.user == null) {
+        this.$router.push({name: 'login'})
       }
     }
   };

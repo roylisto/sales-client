@@ -40,7 +40,7 @@
 <script>
 /* eslint-disable */
   import User from '@/services/User'
-  import {mapGetters} from 'vuex'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'login',
     data() {
