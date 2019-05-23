@@ -38,7 +38,6 @@
         </div>
 </template>
 <script>
-/* eslint-disable */
   import User from '@/services/User'
   import { mapGetters } from 'vuex'
   export default {

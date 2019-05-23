@@ -27,9 +27,9 @@
                                     addon-left-icon="ni ni-lock-circle-open"
                                     v-model="model.password">
                         </base-input>
-                        
+                        <div class="text-center" v-html="model.error" v-if="model.error"/>
                         <div class="text-center">
-                            <base-button type="primary" class="my-4">Create account</base-button>
+                            <base-button type="primary" class="my-4" @click="register()">Create account</base-button>
                         </div>
                     </form>
                 </div>
@@ -45,6 +45,7 @@
     </div>
 </template>
 <script>
+  import User from '@/services/User'  
   export default {
     name: 'register',
     data() {
@@ -52,7 +53,25 @@
         model: {
           name: '',
           email: '',
-          password: ''
+          password: '',
+          error: null
+        }
+      }
+    },
+    methods: {
+      async register() {
+        try {                
+          const response = await User.register({
+            email: this.model.email,
+            name: this.model.name,
+            password: this.model.password
+          })
+          this.model.error = null
+          this.$store.dispatch('setUser', response.data)
+          this.$router.push({name: 'dashboard'})       
+          location.reload();   
+        } catch (err) {          
+          this.model.error = err.response.data.error
         }
       }
     }
