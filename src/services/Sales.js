@@ -1,6 +1,13 @@
 /* eslint-disable */
 import Api from '@/services/Api'
-
-export default {
+function getToken(){
+  const user = JSON.parse(localStorage.getItem('user'))
+  const token = 'Bearer '+user.token
   
+  return {headers: {Authorization: token}}
+}
+export default {
+  list() {
+    return Api().get('/sales', getToken())
+  }
 }
