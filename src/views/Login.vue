@@ -19,10 +19,12 @@
                                         addon-left-icon="ni ni-lock-circle-open"
                                         v-model="model.password">
                             </base-input>
+
+                            <div class="text-center" v-html="model.error" v-if="model.error"/>
                             
                             <div class="text-center">
                                 <base-button type="primary" class="my-4" @click="login">Sign in</base-button>
-                            </div>
+                            </div>                            
                         </form>
                     </div>
                 </div>
@@ -36,6 +38,7 @@
         </div>
 </template>
 <script>
+/* eslint-disable */
   import User from '@/services/User'
   import {mapGetters} from 'vuex'
   export default {
@@ -45,28 +48,23 @@
         model: {
           email: '',
           password: '',
-          error: null,
-          user: null
+          error: null          
         }
       }
     },
     methods: {
       async login() {
-        try {
+        try {                
           const response = await User.login({
-            email: this.email,
-            password: this.password
+            email: this.model.email,
+            password: this.model.password
           })
-          /* this.error = null
-          this.$store.dispatch('setUser', response.data.user)
-          this.$router.push({name: 'dashboard'})
-          location.reload()*/
-          // eslint-disable-next-line
-          console.log(response)
-
-        } catch (err) {
-          // eslint-disable-next-line
-          console.log(err)
+          this.model.error = null
+          this.$store.dispatch('setUser', response.data)
+          this.$router.push({name: 'dashboard'})       
+          location.reload();   
+        } catch (err) {          
+          this.model.error = err.response.data.error
         }
       }
     },
@@ -74,11 +72,6 @@
       ...mapGetters({
         user: 'getUser'
       })
-    },
-    created: function () {
-      if (this.user != null) {
-        this.$router.push({name: 'dashboard'})
-      }
     }
   }
 </script>

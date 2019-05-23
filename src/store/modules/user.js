@@ -13,7 +13,7 @@ const mutations= {
     if(user !== null) {
       state.isUserLoggedIn = true
       state.user = user
-      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('user', JSON.stringify(user))      
     } else if (user === null) {
       state.isUserLoggedIn = false
       state.user = null

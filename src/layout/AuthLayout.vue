@@ -72,8 +72,8 @@
     </div>
 </template>
 <script>
-  import { SlideYUpTransition } from 'vue2-transitions'
-
+  import { SlideYUpTransition } from 'vue2-transitions'  
+  import {mapGetters} from 'vuex'
   export default {
     name: 'auth-layout',
     components: {
@@ -83,6 +83,16 @@
       return {
         year: new Date().getFullYear(),
         showMenu: false
+      }
+    },    
+    computed: {
+      ...mapGetters({
+        user: 'getUser'
+      })
+    },
+    created: function () {
+      if (this.user != null) {
+        this.$router.push({name: 'dashboard'})
       }
     }
   }
