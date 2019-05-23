@@ -9,6 +9,6 @@ export default {
     return Api().post('/user/login', credentials)
   },
   logout(){
-    return Api().post('/user/logout')
+    return Api().get('/user/logout')
   }
 }
