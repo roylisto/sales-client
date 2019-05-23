@@ -4,6 +4,9 @@ import router from './router'
 import './registerServiceWorker'
 import { sync } from 'vuex-router-sync'
 import ArgonDashboard from './plugins/argon-dashboard'
+import moment from 'moment'
+
+Vue.prototype.moment = moment
 
 import store from '@/store'
 
@@ -14,6 +17,7 @@ sync(store, router)
 Vue.prototype.$eventHub = new Vue()
 
 Vue.use(ArgonDashboard)
+
 new Vue({
   router,
   store,

@@ -10,7 +10,36 @@
           </h3>
         </div>
         <div class="col text-right">
-          <base-button type="primary" size="sm">See all</base-button>
+          <base-button type="primary" size="sm" @click="showInputForm = true">Add Data</base-button>
+          <modal :show.sync="showInputForm"
+               body-classes="p-0"
+               modal-classes="modal-dialog-centered modal-sm">
+              <card type="secondary" shadow
+                    header-classes="bg-white pb-5"
+                    body-classes="px-lg-5 py-lg-5"
+                    class="border-0">                  
+                  <template>
+                      <div class="text-center text-muted mb-4">
+                          <big>Add new sales data</big>
+                      </div>
+                      <form role="form">
+                          <base-input alternative
+                                      class="mb-3"
+                                      placeholder="Email"
+                                      addon-left-icon="ni ni-email-83">
+                          </base-input>
+                          <base-input alternative
+                                      type="password"
+                                      placeholder="Password"
+                                      addon-left-icon="ni ni-lock-circle-open">
+                          </base-input>                          
+                          <div class="text-center">
+                              <base-button block type="success" class="my-4">Save</base-button>
+                          </div>
+                      </form>
+                  </template>
+              </card>
+          </modal>
         </div>
       </div>
     </div>
@@ -27,30 +56,20 @@
           <th>Price</th>
           <th>Quantity</th>
           <th>Amount</th>
-          <th>Date</th>
+          <th>DateTime</th>
           <th></th>
         </template>
 
         <template slot-scope="{row}">
           <td>{{row.sales_name}}</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td class="text-right">
-            <base-dropdown class="dropdown"
-                           position="right">
-              <a slot="title" class="btn btn-sm btn-icon-only text-light" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-ellipsis-v"></i>
-              </a>
-
-              <template>
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </template>
-            </base-dropdown>
+          <td>{{row.product_name}}</td>
+          <td>{{row.price}}</td>
+          <td>{{row.quantity}}</td>
+          <td>{{row.ammount}}</td>
+          <td>{{ moment(row.createdAt).format('DD-MM-YYYY HH:mm:ss') }}</td>
+          <td>
+            <base-button type="danger" size="sm" icon="ni ni-fat-remove"></base-button>
+            <base-button type="info" size="sm" icon="ni ni-settings-gear-65"></base-button>
           </td>
 
         </template>
@@ -60,14 +79,14 @@
 
     <div class="card-footer d-flex justify-content-end"
          :class="type === 'dark' ? 'bg-transparent': ''">
-      <base-pagination :total="30"></base-pagination>
+      <base-pagination :total="this.rowCount"></base-pagination>
     </div>
 
   </div>
 </template>
 <script>
 /* eslint-disable */
-  import Sales from '@/services/Sales'
+  import Sales from '@/services/Sales'  
   export default {
     name: 'sales-table',
     props: {
@@ -78,12 +97,15 @@
     },
     data() {
       return {
-        tableData: []
+        tableData: [],
+        rowCount: 0,
+        showInputForm: false
       }
     },    
     created: async function () {
       const response = await Sales.list()  
-      this.tableData = response.data.rows          
+      this.tableData = response.data.rows   
+      this.rowCount = response.data.count       
     }
   }
 </script>
