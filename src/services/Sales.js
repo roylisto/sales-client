@@ -9,5 +9,11 @@ function getToken(){
 export default {
   list() {
     return Api().get('/sales', getToken())
+  },
+  add(sales) {
+    return Api().post('/sales', sales, getToken())
+  },
+  delete(salesId) {
+    return Api().delete('/sales/'+salesId, getToken())
   }
 }

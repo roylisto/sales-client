@@ -40,13 +40,15 @@
                             <div class="col-sm">
                               <base-input alternative
                                       class="mb-3"
-                                      placeholder="Quantity">
+                                      type="number"
+                                      placeholder="Quantity"
+                                      v-model="quantity">
                               </base-input>  
                             </div>                            
                           </div>
                         </div>                                                                                                  
                           <div class="text-center">
-                              <base-button block type="success" class="my-4">Save</base-button>
+                              <base-button block type="success" class="my-4" @click="saveSalesData">Save</base-button>
                           </div>
                       </form>
                   </template>
@@ -80,7 +82,7 @@
           <td>{{row.ammount}}</td>
           <td>{{ moment(row.createdAt).format('DD-MM-YYYY HH:mm:ss') }}</td>
           <td>
-            <base-button type="danger" size="sm" icon="ni ni-fat-remove"></base-button>
+            <base-button type="danger" size="sm" icon="ni ni-fat-remove" @click="deleteSalesData(row.id)"></base-button>
             <base-button type="info" size="sm" icon="ni ni-settings-gear-65"></base-button>
           </td>
 
@@ -99,7 +101,8 @@
 <script>
 /* eslint-disable */    
   import Product from '@/services/Product'
-  import { mapGetters } from 'vuex'
+  import Sales from '@/services/Sales'
+  import { mapGetters, mapActions } from 'vuex'
   export default {
     name: 'sales-table',
     props: {
@@ -113,17 +116,10 @@
         rowCount: 0,
         showInputForm: false,
         selectedName: 'Product',
-        selectedId: 0        
+        selectedId: 0,
+        quantity: 0        
       }
-    },    
-    /*created: async function () {
-      const response = await Sales.list()  
-      this.tableData = response.data.rows   
-      this.rowCount = response.data.count  
-      
-      const prodResponse = await Product.list()      
-      this.products = prodResponse.data.products.rows
-    },*/
+    },
     created() {
       this.$store.dispatch("fetchSales")
       this.$store.dispatch("fetchProduct")      
@@ -132,14 +128,49 @@
       ...mapGetters({
         sales: 'getSales',
         salesCount: 'getSalesCount',
-        products : 'getProduct'
+        products : 'getProduct',
+        user: 'getUser'
       })
     },
-    methods: {      
+    methods: {            
       setSelectedProduct(index) {
         let product = this.products[index]
         this.selectedName = product.name
         this.selectedId = product.id
+      },
+      async saveSalesData(){        
+        try {                
+          const response = await Sales.add({
+            user_id: this.user.user_id,
+            product_id: this.selectedId,
+            quantity: this.quantity
+          })          
+          this.$notify({
+            type: 'success',
+            title: response.data.message
+          })
+          this.$store.dispatch('fetchSales')          
+        } catch (err) {          
+          this.$notify({
+            type: 'danger',
+            title: err.response.data.message
+          })
+        }
+      },
+      async deleteSalesData(salesId){
+        try {                
+          const response = await Sales.delete(salesId)          
+          this.$notify({
+            type: 'warning',
+            title: response.data.message
+          })
+          this.$store.dispatch('fetchSales')          
+        } catch (err) {          
+          this.$notify({
+            type: 'danger',
+            title: err.response.data.message
+          })
+        }
       }
     }
   }
