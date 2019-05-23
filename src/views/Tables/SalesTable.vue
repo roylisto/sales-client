@@ -93,7 +93,7 @@
 
     <div class="card-footer d-flex justify-content-end"
          :class="type === 'dark' ? 'bg-transparent': ''">
-      <base-pagination :total="this.salesCount" v-model="pagination.default"></base-pagination>
+      <base-pagination :total="this.salesCountNoLimit" v-model="pagination.default"></base-pagination>
     </div>
 
   </div>
@@ -125,7 +125,8 @@
     },
     created() {
       this.$store.dispatch("fetchSales", {        
-        userId: this.user.user_id        
+        rowStart: 0,
+        rowCount: 10
       })
       this.$store.dispatch("fetchProduct")      
     },
@@ -133,6 +134,7 @@
       ...mapGetters({
         sales: 'getSales',
         salesCount: 'getSalesCount',
+        salesCountNoLimit: 'getSalesCountNoLimit',
         products : 'getProduct',
         user: 'getUser'
       })
