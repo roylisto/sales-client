@@ -15,5 +15,8 @@ export default {
   },
   delete(salesId) {
     return Api().delete('/sales/'+salesId, getToken())
+  },
+  update(salesId, updates){
+    return Api().patch('/sales/'+salesId, {updates: updates}, getToken())
   }
 }

@@ -84,7 +84,7 @@
           <td>{{ moment(row.createdAt).format('DD-MM-YYYY HH:mm:ss') }}</td>
           <td>
             <base-button type="danger" size="sm" icon="ni ni-fat-remove" @click="deleteSalesData(row.id)"></base-button>
-            <base-button type="info" size="sm" icon="ni ni-settings-gear-65"></base-button>
+            <base-button type="info" size="sm" icon="ni ni-settings-gear-65" @click="openEditForm(row.id, row.product_id, row.quantity)"></base-button>
           </td>
 
         </template>
@@ -96,6 +96,50 @@
          :class="type === 'dark' ? 'bg-transparent': ''">
       <base-pagination :total="this.salesCountNoLimit" v-model="page"></base-pagination>
     </div>
+
+    <modal :show.sync="showEditForm"
+            body-classes="p-0"
+            modal-classes="modal-dialog-centered">
+          <card type="secondary" shadow
+                header-classes="bg-white pb-5"
+                body-classes="px-lg-5 py-lg-5"
+                class="border-0">                  
+              <template>
+                  <div class="text-center text-muted mb-4">
+                      <big>Edit sales data</big>
+                  </div>
+                  <form role="form">
+                    <div class="container ct-example-row">
+                      <div class="row">
+                        <div class="col-sm">
+                          <base-dropdown class="mb-3"> 
+                            <base-button block slot="title" type="warning" class="dropdown-toggle">
+                              {{editedValue.selectedName}}
+                            </base-button>                                   
+                            <ul>
+                              <li v-for="(item, index) in products" :key="item.id">
+                                  <a class="dropdown-item" href="#" @click="setSelectedUpdateProduct(index)" >{{item.name}}</a>
+                              </li>
+                            </ul>                           
+                          </base-dropdown>
+                        </div>
+                        <div class="col-sm">
+                          <base-input alternative
+                                  class="mb-3"
+                                  type="number"
+                                  placeholder="Quantity"
+                                  v-model="editedValue.quantity">
+                          </base-input>  
+                        </div>                            
+                      </div>
+                    </div>                                                                                                  
+                      <div class="text-center">
+                          <base-button block type="success" class="my-4" @click="updateSalesData">Update</base-button>
+                      </div>
+                  </form>
+              </template>
+          </card>
+      </modal>
 
   </div>
 </template>
@@ -116,10 +160,17 @@
       return {                
         rowCount: 0,
         showInputForm: false,
+        showEditForm: false,
         selectedName: 'Product',
         selectedId: 0,
         quantity: 0,
-        page: 1      
+        page: 1,
+        editedValue: {
+          selectedName: 'Product',
+          selectedId: 0,
+          salesId: 0,          
+          quantity: 0
+        }      
       }
     },
     created() {
@@ -146,18 +197,51 @@
         })
       }
     },
-    methods: {            
+    methods: { 
+      setSelectedUpdateProduct(index) {
+        let product = this.products[index]
+        this.editedValue.selectedName = product.name
+        this.editedValue.selectedId = product.id
+      },           
       setSelectedProduct(index) {
         let product = this.products[index]
         this.selectedName = product.name
         this.selectedId = product.id
       },      
+      openEditForm(salesId, productId, quantity){
+        this.editedValue.salesId = salesId
+        this.editedValue.selectedId = productId
+        let editSelectedProduct = this.products.filter(product => {          
+          return product.id == productId
+        })        
+        this.editedValue.selectedName = editSelectedProduct[0].name
+        this.editedValue.quantity = quantity
+        this.showEditForm = true
+      },
       async saveSalesData(){        
         try {                
           const response = await Sales.add({
             user_id: this.user.user_id,
             product_id: this.selectedId,
             quantity: this.quantity
+          })          
+          this.$notify({
+            type: 'success',
+            title: response.data.message
+          })
+          await this.$store.dispatch('fetchSales')          
+        } catch (err) {          
+          this.$notify({
+            type: 'danger',
+            title: err.response.data.message
+          })
+        }
+      },
+      async updateSalesData(){        
+        try {                
+          const response = await Sales.update(this.editedValue.salesId,{
+            product_id: this.editedValue.selectedId,
+            quantity: this.editedValue.quantity
           })          
           this.$notify({
             type: 'success',
