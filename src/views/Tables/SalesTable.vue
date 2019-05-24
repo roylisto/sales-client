@@ -10,7 +10,7 @@
           </h3>
         </div>
         <div class="col text-right">
-          <base-button type="primary" size="sm" @click="showInputForm = true">Add Data</base-button>
+          <base-button type="primary" size="sm" @click="showInputForm = true">Add Data</base-button>          
           <modal :show.sync="showInputForm"
                body-classes="p-0"
                modal-classes="modal-dialog-centered">
@@ -64,6 +64,7 @@
                   :thead-classes="type === 'dark' ? 'thead-dark': 'thead-light'"
                   tbody-classes="list"
                   :data="sales">
+
         <template slot="columns">
           <th>Sales Name</th>
           <th>Product Name</th>
@@ -93,7 +94,7 @@
 
     <div class="card-footer d-flex justify-content-end"
          :class="type === 'dark' ? 'bg-transparent': ''">
-      <base-pagination :total="this.salesCountNoLimit" v-model="pagination.default"></base-pagination>
+      <base-pagination :total="this.salesCountNoLimit" v-model="page"></base-pagination>
     </div>
 
   </div>
@@ -118,15 +119,13 @@
         selectedName: 'Product',
         selectedId: 0,
         quantity: 0,
-        pagination: {
-          default: 1
-        }        
+        page: 1      
       }
     },
     created() {
-      this.$store.dispatch("fetchSales", {        
+      this.$store.dispatch("fetchSales", {      
         rowStart: 0,
-        rowCount: 10
+        rowCount: 10  
       })
       this.$store.dispatch("fetchProduct")      
     },
@@ -139,12 +138,20 @@
         user: 'getUser'
       })
     },
+    watch:{
+      page: function(val){        
+        this.$store.dispatch("fetchSales", {      
+          rowStart: (this.page - 1) * 10,
+          rowCount: 10  
+        })
+      }
+    },
     methods: {            
       setSelectedProduct(index) {
         let product = this.products[index]
         this.selectedName = product.name
         this.selectedId = product.id
-      },
+      },      
       async saveSalesData(){        
         try {                
           const response = await Sales.add({
@@ -156,7 +163,7 @@
             type: 'success',
             title: response.data.message
           })
-          this.$store.dispatch('fetchSales')          
+          await this.$store.dispatch('fetchSales')          
         } catch (err) {          
           this.$notify({
             type: 'danger',
@@ -171,7 +178,10 @@
             type: 'warning',
             title: response.data.message
           })
-          this.$store.dispatch('fetchSales')          
+          await this.$store.dispatch('fetchSales',{      
+            rowStart: (this.page - 1) * 10,
+            rowCount: 10  
+          })          
         } catch (err) {          
           this.$notify({
             type: 'danger',

@@ -29,9 +29,14 @@ const actions = {
     commit('setSalesCountNoLimit', salesCountNoLimit)
   },
   async fetchSales({commit}, filters){
-    let response = await Sales.list(filters)          
-    commit('setSales', response.data.rows)  
-    commit('setSalesCountNoLimit', response.data.countNoLimit)  
+    try {
+      let response = await Sales.list(filters)    
+      commit('setSales', response.data.rows)  
+      commit('setSalesCountNoLimit', response.data.countNoLimit)  
+    } catch (error) {
+      commit('setSales', [])  
+    }
+    
   }
 }
 
